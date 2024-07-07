@@ -46,21 +46,68 @@ else
     fi
 fi
   
-while :
-do
-    echo -n "Hello , welcome to the tdl! Choose an option to upload dirs or files (1 default|2 other channel) enter a number :       "   
-    read option   
-    if [ "$option" == "1" ]; then
-      echo "Please enter your path dir or file:" 
-      read $path 
-      tdl up -p $path   
-     elif [ "$option" == "2" ]; then
-      echo "Please copy the number of channel to upload file or dir:"
-      tdl chat ls   
-    fi   
-    echo "Please enter your channel to upload dir or file"
-    read $channel
-    echo "Please enter your path dir or file:" 
-    read $path 
-    tdl up -p $path -c $channel
-done
+  
+  
+echo -n "Hello , welcome to the tdl! Choose an option to login (1 Pro|2 Free|) enter a number :     "
+ read option
+ if [ "$option" == "1" ]; then
+    while :
+    do
+     echo -n "Hello , welcome to the tdl! Choose an option to upload dirs or files (1 default|2 other channel) enter a number :       "   
+     read option   
+     if [ "$option" == "1" ]; then
+       echo "Please enter the name of the file or folder:" 
+       read NAME
+       PFILE=$(find . -name "$NAME")
+       RFIND=$(basename "$PFILE")
+       FPATH="$(cd "$(dirname "$PFILE")"; pwd -P)"
+       tdl up -p "$FPATH/$RFIND"  
+      elif [ "$option" == "2" ]; then
+       tdl chat ls  
+       echo "Please enter the number of channel to upload folder or file"
+       read CHANNEL
+       echo "Please enter the name of the file or folder:" 
+       read NAME
+       PFILE=$(find . -name "$NAME")
+       RFIND=$(basename "$PFILE")
+       FPATH="$(cd "$(dirname "$PFILE")"; pwd -P)"
+       tdl up -p "$FPATH/$RFIND"  -c $CHANNEL
+     fi
+   done
+  elif [ "$option" == "2" ]; then
+   while :
+   do
+     echo -n "Hello , welcome to the tdl! Choose an option to upload folder or file (1 default|2 other channel) enter a number :       "   
+     read option   
+     if [ "$option" == "1" ]; then
+       echo "Please enter the name of the file or folder:" 
+       read NAME
+       PFILE=$(find . -name "$NAME")
+       RFIND=$(basename "$PFILE")
+       FPATH="$(cd "$(dirname "$PFILE")"; pwd -P)"
+       find "$(cd "$(dirname "$PFILE")"; pwd -P)" -maxdepth 1 -size +2G | while read FILE; do
+         cd "$FPATH" && split -b 1G -d "$FILE" "$RFIND.part" && cd $HOME/Downloads
+         find . -name "$RFIND.part*" >> "$RFIND".sh
+         sed -i 's\./\tdl up -p /\' "$RFIND.sh" \
+	 	     chmod +x "$RFIND.sh" && ./"$RFIND.sh"
+       done
+       tdl up -p "$FPATH/$RFIND"
+      elif [ "$option" == "2" ]; then
+       tdl chat ls      
+       echo "Please enter the number of channel to upload folder or file"
+       read CHANNEL
+       echo "Please enter the name of the file or folder:" 
+       read NAME
+       PFILE=$(find . -name "$NAME")
+       RFIND=$(basename "$PFILE")
+       FPATH="$(cd "$(dirname "$PFILE")"; pwd -P)"
+       find "$(cd "$(dirname "$PFILE")"; pwd -P)" -maxdepth 1 -size +2G | while read FILE; do
+         cd "$FPATH" && split -b 1G -d "$FILE" "$RFIND.part" && cd $HOME/Downloads
+         find . -name "$RFIND.part*" >> "$RFIND".sh
+         sed -i s\./\tdl up -c "$CHANNEL" -p /\ "$RFIND.sh" \
+         chmod +x "$RFIND.sh" && ./"$RFIND.sh"
+       done
+       tdl up -p "$FPATH/$RFIND" -c $CHANNEL
+	 fi
+   done
+ fi
