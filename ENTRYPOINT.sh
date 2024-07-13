@@ -40,6 +40,16 @@ service postgresql start
 #psql -c "GRANT ALL PRIVILEGES ON DATABASE filebrowser TO $PS_USER;"
 #EOF
 
+# Install JDownloader
+su - $USER -c "mkdir -p /home/$USER/jdownloader/cfg"
+su - $USER -c "curl -fSL http://installer.jdownloader.org/JDownloader.jar -o /home/$USER/jdownloader/JDownloader.jar"
+su - $USER -c "chmod +x /home/$USER/jdownloader/JDownloader.jar"
+su - $USER -c "java -jar /home/$USER/jdownloader/JDownloader.jar -norestart"
+su - $USER -c cat > /home/$USER/jdownloader/cfg/org.jdownloader.api.myjdownloader.MyJDownloaderSettings.json <<END 
+{"autoconnectenabledv2":true,"password":"$JD_PASSWORD","devicename":"$JD_DEVICE_NAME","email":"$JD_EMAIL"}
+END
+su - $USER -c "java -jar /home/$USER/jdownloader/JDownloader.jar -norestart >> /home/$USER/jdownloader.log &" 
+
 # install tdl
 wget https://github.com/sorenisanerd/gotty/releases/download/v1.5.0/gotty_v1.5.0_linux_amd64.tar.gz
 tar -xf gotty_v1.5.0_linux_amd64.tar.gz && rm -rf gotty_v1.5.0_linux_amd64.tar.gz
@@ -71,13 +81,4 @@ chmod +x zrok/zrok
 mv zrok/zrok /usr/local/bin/zrok
 rm -rf zrok zrok.tar.gz
 su - $USER -c "zrok enable $ZROK_ENVIRONMENT"
-su - $USER -c "zrok share private -b tcpTunnel 0.0.0.0:22 --headless & zrok share public localhost:10000 --headless & zrok share public localhost:4444 --headless & zrok share public localhost:12345 --headless & zrok share public localhost:7777 --headless >> zrok.log &"
-
-# Install JDownloader
-su - $USER -c "mkdir -p /home/$USER/jdownloader/cfg"
-su - $USER -c 'curl -fSL "http://installer.jdownloader.org/JDownloader.jar" -o /home/$USER/jdownloader/JDownloader.jar'
-su - $USER -c "java -jar /home/$USER/jdownloader/JDownloader.jar -norestart"
-su - $USER -c cat > /home/$USER/jdownloader/cfg/org.jdownloader.api.myjdownloader.MyJDownloaderSettings.json <<END 
-{\"devicename\" : \"$JD_DEVICE_NAME\", \"autoconnectenabledv2\" : true, \"password\" : \"$JD_PASSWORD\", \"email\" : \"$JD_EMAIL\"}
-END
-su - $USER -c "java -jar /home/$USER/jdownloader/JDownloader.jar -norestart >> /home/$USER/jdownloader.log "
+su - $USER -c "zrok share private -b tcpTunnel 0.0.0.0:22 --headless & zrok share public localhost:10000 --headless & zrok share public localhost:4444 --headless & zrok share public localhost:12345 --headless & zrok share public localhost:7777 --headless "
