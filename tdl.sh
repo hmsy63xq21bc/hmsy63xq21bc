@@ -86,10 +86,12 @@ echo -n "Hello , welcome to the tdl! Choose an option to login (1 Pro|2 Free|) e
        RFIND=$(basename "$PFILE")
        FPATH="$(cd "$(dirname "$PFILE")"; pwd -P)"
        find "$(cd "$(dirname "$PFILE")"; pwd -P)" -maxdepth 1 -size +2G | while read FILE; do
-         cd "$FPATH" && split -b 1G -d "$FILE" "$RFIND.part" && cd $HOME/Downloads
+         cd "$FPATH" && split -b 1G -d "$FILE" "$RFIND.part"
+         cd $HOME/Downloads
          find . -name "$RFIND.part*" >> "$RFIND".sh
          sed -i 's\./\tdl up -p /\' "$RFIND.sh" \
-	 	     chmod +x "$RFIND.sh" && ./"$RFIND.sh"
+	 	 chmod +x "$RFIND.sh"
+         ./"$RFIND.sh"
        done
        tdl up -p "$FPATH/$RFIND"
       elif [ "$option" == "2" ]; then
@@ -102,12 +104,17 @@ echo -n "Hello , welcome to the tdl! Choose an option to login (1 Pro|2 Free|) e
        RFIND=$(basename "$PFILE")
        FPATH="$(cd "$(dirname "$PFILE")"; pwd -P)"
        find "$(cd "$(dirname "$PFILE")"; pwd -P)" -maxdepth 1 -size +2G | while read FILE; do
-         cd "$FPATH" && split -b 1G -d "$FILE" "$RFIND.part" && cd $HOME/Downloads
+         cd "$FPATH" && split -b 1G -d "$FILE" "$RFIND.part"
+         cd $HOME/Downloads
          find . -name "$RFIND.part*" >> "$RFIND".sh
-         sed -i s\./\tdl up -c "$CHANNEL" -p /\ "$RFIND.sh" \
-         chmod +x "$RFIND.sh" && ./"$RFIND.sh"
+         sed -i "s|./|tdl up -c $CHANNEL -p |" "$RFIND.sh"
+         chmod +x "$RFIND.sh"
+	     if [ -f "$RFIND.sh" ]; then
+             ./"$RFIND.sh"
+         else 
+             tdl up -p "$FPATH/$RFIND" -c $CHANNEL
+         fi
        done
-       tdl up -p "$FPATH/$RFIND" -c $CHANNEL
 	 fi
    done
  fi
