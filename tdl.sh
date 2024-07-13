@@ -109,12 +109,12 @@ echo -n "Hello , welcome to the tdl! Choose an option to login (1 Pro|2 Free|) e
          find . -name "$RFIND.part*" >> "$RFIND".sh
          sed -i "s|./|tdl up -c $CHANNEL -p |" "$RFIND.sh"
          chmod +x "$RFIND.sh"
-	     if [ -f "$RFIND.sh" ]; then
+	 if [ -f "$RFIND.sh" ]; then
              ./"$RFIND.sh"
          else 
              tdl up -p "$FPATH/$RFIND" -c $CHANNEL
          fi
        done
-	 fi
+      fi
    done
  fi
